@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TÍNH ĐIỂM DNU</title>
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+font-family:'Baloo 2',sans-serif;
+background:linear-gradient(180deg,#dff4ff,#f7fbff,#e9f7ff);
+min-height:100vh;color:#114b87;overflow-x:hidden;
+}
+.container{max-width:1100px;margin:auto;padding:20px}
+.hero{text-align:center;padding:30px 0}
+.hero h1{font-size:42px;text-shadow:0 0 15px rgba(0,170,255,.5)}
+.card{
+background:rgba(255,255,255,.78);
+backdrop-filter:blur(14px);
+border-radius:24px;
+padding:24px;
+margin:20px 0;
+box-shadow:0 8px 30px rgba(0,0,0,.08);
+}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:800px){.grid{grid-template-columns:1fr}}
+input{
+width:100%;padding:12px;border-radius:12px;border:1px solid #cfe2ff;margin-top:6px;margin-bottom:12px
+}
+button{
+padding:12px 18px;border:none;border-radius:12px;cursor:pointer;font-weight:bold
+}
+.primary{background:#1570ef;color:white}
+.success{background:#00a86b;color:white}
+.result{
+margin-top:15px;padding:15px;border-radius:16px;background:#eef8ff
+}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px;border-bottom:1px solid #ddd;text-align:center}
+th{background:#1570ef;color:#fff}
+.snowflake{position:fixed;top:-20px;color:white;pointer-events:none;z-index:999}
+.cloud{
+position:fixed;opacity:.15;font-size:90px;animation:cloud 35s linear infinite
+}
+@keyframes cloud{from{transform:translateX(-200px)}to{transform:translateX(calc(100vw + 200px))}}
+.badge{display:inline-block;padding:4px 10px;border-radius:999px;background:#1570ef;color:white}
+
+body.dark{
+  background:linear-gradient(180deg,#0f172a,#020617,#020617);
+  color:#e2e8f0;
+}
+body.dark .card{background:rgba(30,41,59,.85);color:#e2e8f0;}
+body.dark input{background:#0f172a;color:white;border:1px solid #334155;}
+body.dark table th{background:#1e293b;}
+body.dark .result{background:#0f172a;}
+
+</style>
+</head>
+<body>
+<button onclick="toggleTheme()" style="position:fixed;top:20px;right:20px;z-index:1000">🌙 / ☀️</button>
+
+<div class="cloud" style="top:40px">☁️</div>
+<div class="cloud" style="top:140px;animation-duration:50s">☁️</div>
+
+<div class="container">
+<div class="hero">
+<h1>❄️ TÍNH ĐIỂM ĐẠI HỌC ĐẠI NAM ❄️</h1>
+<p>Giao diện mùa đông - Tính điểm học phần</p>
+</div>
+
+<div class="grid">
+
+<div class="card">
+<h2>🎯 Tính điểm thi tối thiểu để qua môn</h2><br>
+<h2>Chuyên Cần</h2><input id="cc1" type="number" step="0.1">
+<h2>Kiểm Tra 1</h2><input id="kt11" type="number" step="0.1">
+<div id="kt2a" style="display:none">
+<h2>Kiểm Tra 2</h2><input id="kt21" type="number" step="0.1">
+</div>
+<button class="success" onclick="toggle('kt2a')">+ Thêm KT2</button>
+<button class="primary" onclick="calcNeed()">Tính</button>
+<div id="needResult" class="result"></div>
+</div>
+
+<div class="card">
+<h2>📊 Tính điểm tổng kết</h2><br>
+<h2>Chuyên Cần</h2><input id="cc2" type="number" step="0.1">
+<h2>Kiểm Tra 1</h2><input id="kt12" type="number" step="0.1">
+<div id="kt2b" style="display:none">
+<h2>Kiểm Tra 2</h2><input id="kt22" type="number" step="0.1">
+</div>
+<button class="success" onclick="toggle('kt2b')">+ Thêm KT2</button><br><br>
+<h2>Điểm thi</h2><input id="exam" type="number" step="0.1">
+<button class="primary" onclick="calcFinal()">Tính</button>
+<div id="finalResult" class="result"></div>
+</div>
+
+</div>
+
+<div class="card">
+<h2>🏆 Bảng quy đổi</h2><br>
+<table>
+<tr><th>TBHP</th><th>Hệ 4</th><th>Chữ</th><th>Xếp loại</th></tr>
+<tr><td>9.0 - 10</td><td>4.0</td><td>A+</td><td>Xuất sắc</td></tr>
+<tr><td>8.5 - 8.9</td><td>3.7</td><td>A</td><td>Giỏi</td></tr>
+<tr><td>8.0 - 8.4</td><td>3.5</td><td>B+</td><td>Giỏi</td></tr>
+<tr><td>7.0 - 7.9</td><td>3.0</td><td>B</td><td>Khá</td></tr>
+<tr><td>6.5 - 6.9</td><td>2.5</td><td>C+</td><td>TB</td></tr>
+<tr><td>5.5 - 6.4</td><td>2.0</td><td>C</td><td>TB</td></tr>
+<tr><td>5.0 - 5.4</td><td>1.5</td><td>D+</td><td>TB</td></tr>
+<tr><td>< 5.0</td><td>0</td><td>F</td><td>Yếu</td></tr>
+</table>
+</div>
+</div>
+
+<script>
+function toggle(id){
+ let e=document.getElementById(id);
+ e.style.display=e.style.display==='none'?'block':'none';
+}
+function convert(s){
+ if(s>=9)return ['4.0','A+','Xuất sắc'];
+ if(s>=8.5)return ['3.7','A','Giỏi'];
+ if(s>=8)return ['3.5','B+','Giỏi'];
+ if(s>=7)return ['3.0','B','Khá'];
+ if(s>=6.5)return ['2.5','C+','Trung bình'];
+ if(s>=5.5)return ['2.0','C','Trung bình'];
+ if(s>=5)return ['1.5','D+','Trung bình'];
+ return ['0','F','Yếu'];
+}
+function calcNeed(){
+ let cc=+cc1.value||0, kt1=+kt11.value||0;
+ let has=kt2a.style.display!=='none' && kt21.value!=='';
+ let need=has?(4-(cc*.1)-(kt1*.15)-((+kt21.value||0)*.15))/.6:(4-(cc*.1)-(kt1*.3))/.6;
+ if(need<0)need=0;
+ needResult.innerHTML =
+  '<h3>🎯 Kết quả tính toán đã xong!</h3>' +
+  '<p>Để không phải “gặp lại thầy cô lần nữa ở kỳ thi lại”, bạn cần đạt ít nhất <b>' + need.toFixed(2) + '</b> điểm.</p>' +
+  '<p>💡 Gợi ý nhỏ: nếu chưa đủ thì cũng đừng buồn, vì đời còn nhiều kỳ thi khác đang chờ bạn “phục thù” 😌</p>' +
+  '<p>📌 Chúc bạn lần sau làm bài “mượt như code chạy không lỗi” và điểm cao hơn cả mong đợi!</p>' +
+  '<p>🔥 Tip sinh tồn: đừng để hệ thống phải tính lại lần nữa nhé, nó cũng mệt lắm rồi 😆</p>';
+}
+function calcFinal(){
+ let cc=+cc2.value||0, kt1=+kt12.value||0, exam=+document.getElementById('exam').value||0;
+ let total;
+ let has=kt2b.style.display!=='none' && kt22.value!=='';
+ if(has) total=(cc*.1)+(kt1*.15)+((+kt22.value||0)*.15)+(exam*.6);
+ else total=(cc*.1)+(kt1*.3)+(exam*.6);
+ let c=convert(total);
+let color = getColor(total);
+
+finalResult.innerHTML = `
+<table>
+<tr>
+<th>Điểm thi</th>
+<th>TBCHP</th>
+<th>Hệ 4</th>
+<th>Điểm chữ</th>
+<th>Xếp loại</th>
+</tr>
+<tr style="color:white; font-weight:bold; background:${color}">
+<td>${exam}</td>
+<td>${total.toFixed(2)}</td>
+<td>${c[0]}</td>
+<td>${c[1]}</td>
+<td>${c[2]}</td>
+</tr>
+</table>
+`;
+}
+function getColor(score){
+  if(score >= 8.5) return "#00c853"; // xanh
+  if(score >= 7) return "#ffd600";   // vàng
+  if(score >= 5.5) return "#ff9100"; // cam
+  if(score >= 5) return "#aa00ff";   // tím
+  return "#ff1744";                  // đỏ
+}
+setInterval(()=>{
+ const s=document.createElement('div');
+ s.className='snowflake';
+ s.innerHTML='❄';
+ s.style.left=Math.random()*100+'vw';
+ s.style.fontSize=(10+Math.random()*20)+'px';
+ s.style.opacity=Math.random();
+ s.style.transition='transform 10s linear';
+ document.body.appendChild(s);
+ requestAnimationFrame(()=>s.style.transform='translateY(110vh)');
+ setTimeout(()=>s.remove(),10000);
+},180);
+
+function toggleTheme(){
+  document.body.classList.toggle("dark");
+  localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark":"light");
+}
+if(localStorage.getItem("theme")==="dark"){
+  document.body.classList.add("dark");
+}
+
+function showContact(){
+  let box = document.getElementById("contactBox");
+  box.style.display = box.style.display === "none" ? "block" : "none";
+}
+function copyZalo() {
+    const text = document.getElementById("zaloText").innerText;
+
+    navigator.clipboard.writeText(text).then(() => {
+        showToast();
+    });
+}
+
+function showToast() {
+    const toast = document.getElementById("toast");
+    toast.style.display = "block";
+
+    setTimeout(() => {
+        toast.style.display = "none";
+    }, 1500);
+}
+</script>
+
+<div style="position:fixed;bottom:20px;right:20px;z-index:1000">
+  <button onclick="showContact()" class="primary">📞 Liên hệ Admin</button>
+</div>
+
+<div id="contactBox" style="
+max-width:250px;
+display:none;
+position:fixed;
+bottom:80px;
+right:20px;
+background:linear-gradient(145deg,#ffffff,#f7f7ff);
+padding:16px;
+border-radius:18px;
+box-shadow:0 12px 30px rgba(0,0,0,0.18);
+font-family:'Segoe UI', Roboto, Arial, sans-serif;
+color:#222;
+line-height:1.5;
+">
+
+  <div style="font-size:15px;font-weight:700;margin-bottom:10px;">
+    👑 Admin hỗ trợ
+  </div>
+
+  <div style="font-size:13.5px;font-weight:500;margin-bottom:8px;">
+    📱 Zalo: <span id="zaloText" style="font-weight:600;">0567866683</span>
+  </div>
+
+  <!-- Nút copy -->
+  <button onclick="copyZalo()" style="
+    width:100%;
+    margin-bottom:10px;
+    padding:7px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    background:#ff3d6e;
+    color:#fff;
+    font-weight:600;
+    font-size:13px;
+  ">
+    📋 Copy Zalo
+  </button>
+
+  <div style="margin-bottom:14px;font-size:13.5px;">
+     
+    <a href="https://hotgenz.com" target="_blank" style="
+      color:#ff3d6e;
+      font-weight:700;
+      text-decoration:none;
+    ">
+      🌐 Lên Báo GenZ
+    </a>
+  </div>
+  <div style="margin-bottom:14px;font-size:13.5px;">
+     
+    <a href="https://nuoi.hotgenz.com/" target="_blank" style="
+      color:#ff3d6e;
+      font-weight:700;
+      text-decoration:none;
+    ">
+      🌐 Góp Gạch Xây Nhà Admin
+    </a>
+  </div>
+  <button onclick="showContact()" style="
+    width:100%;
+    padding:8px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    background:#111;
+    color:#fff;
+    font-weight:600;
+    font-size:13px;
+  ">
+    Đóng
+  </button>
+
+</div>
+
+<!-- Toast thông báo -->
+<div id="toast" style="
+position:fixed;
+bottom:30px;
+right:20px;
+background:#111;
+color:#fff;
+padding:8px 12px;
+border-radius:10px;
+font-size:13px;
+display:none;
+">
+  Đã copy Zalo ✔
+</div>
+
+</body>
+</html>
